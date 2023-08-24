@@ -16,17 +16,27 @@ interface Volunteer {
 const TableEntry: React.FC<{ volunteer: Volunteer }> = ({ volunteer }) => {
   return (
     <tr>
-      <td>{volunteer.name}</td>
-      <td>{volunteer.avatar}</td>
-      <td>{volunteer.hero_project}</td>
-      <td>{volunteer.notes}</td>
-      <td>{volunteer.email}</td>
-      <td>{volunteer.phone}</td>
-      <td>{volunteer.rating}</td>
-      <td>{volunteer.status ? 'Active' : 'Inactive'}</td>
+      <td className="font-bold px-4 py-2">{volunteer.name}</td>
+      <td className="px-4 py-2">{volunteer.avatar}</td>
+      <td className="px-4 py-2">{volunteer.hero_project}</td>
+      <td className="px-4 py-2">{volunteer.notes}</td>
+      <td className="px-4 py-2">{volunteer.email}</td>
+      <td className="px-4 py-2">{volunteer.phone}</td>
+      <td className="px-4 py-2">{volunteer.rating}</td>
+      <td className="px-4 py-2">
+        {volunteer.status ? (
+          <span className="bg-green-500 text-white px-2 py-1 rounded-full">
+            Active
+          </span>
+        ) : (
+          <span className="bg-red-500 text-white px-2 py-1 rounded-full">
+            Inactive
+          </span>
+        )}
+      </td>
     </tr>
-  );
-};
+  )
+}
 
 function App() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
@@ -43,18 +53,18 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <table>
+    <div className="container mx-auto mt-8">
+      <table className="min-w-full">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Avatar</th>
-            <th>Hero Project</th>
-            <th>Notes</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Rating</th>
-            <th>Status</th>
+            <th className="px-4 py-2">Name</th>
+            <th className="px-4 py-2">Avatar</th>
+            <th className="px-4 py-2">Hero Project</th>
+            <th className="px-4 py-2">Notes</th>
+            <th className="px-4 py-2">Email</th>
+            <th className="px-4 py-2">Phone</th>
+            <th className="px-4 py-2">Rating</th>
+            <th className="px-4 py-2">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -64,7 +74,7 @@ function App() {
         </tbody>
       </table>
     </div>
-  );
+  )
 }
 
 export default App;
