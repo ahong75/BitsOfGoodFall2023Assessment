@@ -1,1 +1,1 @@
-export * from './Volunteer'
+export type { Volunteer } from './Volunteer'

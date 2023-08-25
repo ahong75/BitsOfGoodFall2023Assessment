@@ -1,4 +1,4 @@
-export interface Volunteer {
+export type Volunteer = {
   name: string;
   avatar: string;
   hero_project: string;
