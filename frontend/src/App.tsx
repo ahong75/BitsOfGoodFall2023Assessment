@@ -6,7 +6,6 @@ import { Volunteer, TableEntryActions } from './types'
 function App() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [volunteerFormDisplayMode, setVolunteerFormDisplayMode] = useState("notDisplaying");
-
   const newVolunteerInitial = {
     name: "",
     avatar: "",
@@ -18,6 +17,7 @@ function App() {
     status: false,
     id: 0,
   }
+  const [volunteerToUpdate, setVolunteerToUpdate] = useState(newVolunteerInitial)
 
   useEffect(() => {
     fetch('http://localhost:5000/api/bog/users')
@@ -34,6 +34,10 @@ function App() {
     const newVolunteerWithId = {...newVolunteer, id: volunteers.length + 1}
     fetch(`http://localhost:5000/api/bog/users`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newVolunteerWithId),
     })
     .then(response => {
       if (response.ok) {
@@ -49,6 +53,10 @@ function App() {
   const updateVolunteerSubmit = (updatedVolunteer: Volunteer) => {
     fetch(`http://localhost:5000/api/bog/users/${updatedVolunteer.id}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedVolunteer),
     })
     .then(response => {
       if (response.ok) {
@@ -67,6 +75,10 @@ function App() {
   const tableEntryActions: TableEntryActions = {
     edit: (volunteerId: number) => {
       setVolunteerFormDisplayMode("updatingVolunteer")
+      const newVolunteerToUpdate = volunteers.find(volunteer => volunteer.id === volunteerId)
+      if (newVolunteerToUpdate) {
+        setVolunteerToUpdate(newVolunteerToUpdate)
+      }
     },
     delete: (volunteerId: number) => {
       fetch(`http://localhost:5000/api/bog/users/${volunteerId}`, {
@@ -89,7 +101,7 @@ function App() {
         <VolunteerForm handleSubmit={newVolunteerSubmit} initialFormState={newVolunteerInitial}/>
       )}
       {volunteerFormDisplayMode === "updatingVolunteer" && (
-        <VolunteerForm handleSubmit={updateVolunteerSubmit} initialFormState={newVolunteerInitial}/>
+        <VolunteerForm handleSubmit={updateVolunteerSubmit} initialFormState={volunteerToUpdate}/>
       )}
       {volunteers.length > 0 ? (
         <table className="min-w-full">

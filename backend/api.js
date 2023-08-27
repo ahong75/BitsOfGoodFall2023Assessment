@@ -22,29 +22,25 @@ app.get('/api/bog/users/:id', (req, res) => {
 });
 
 app.put('/api/bog/users/:id', (req, res) => {
-  const newUser = req.params
-  const index = database.findIndex((user) => user.id === newUser.id)
-  if (index === -1) {
+  const updatedUser = req.body
+  if (databaseUpdate(updatedUser) == -1) {
     res.json({error: 'Volunteer not found'}).status(400)
     return;
   }
-  databaseUpdate(newUser.id, newUser)
-  res.json(newUser).status(200)
+  res.json(updatedUser).status(200)
 });
 
 app.post('/api/bog/users', (req, res) => {
-  database = database.push(req.params)
+  database = database.push(req.body)
   res.json(req.params).status(201)
 });
 
 app.delete('/api/bog/users/:id', (req, res) => {
   const id = req.params.id
-  const index = database.findIndex((user) => user.id === id)
-  if (index === -1) {
+  if (databaseDelete(id) == -1) {
     res.json({error: 'Volunteer not found'}).status(400)
     return;
   }
-  databaseDelete(id)
   res.json('Volunteer successfully deleted').status(200)
 });
 // Start the server

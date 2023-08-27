@@ -12,18 +12,25 @@ function readDatabaseFromFile() {
 }
 
 function writeDatabaseToFile(data) {
-  fs.writeFileSync(databaseFilePath, JSON.stringify(data, null, 2), 'utf8');
+  try {
+    fs.writeFileSync(databaseFilePath, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error writing to database file:', err);
+  }
 }
 
 export let database = readDatabaseFromFile();
 
 // Object with same id must exist in database
-export function databaseUpdate(newUser) {
-  database = database.map((user) => (user.id === newUser.id ? newUser : user));
+export function databaseUpdate(updatedUser) {
+  const index = database.findIndex(user => user.id === updatedUser.id)
+  if (index == -1) return -1
+  database[index] = updatedUser
   writeDatabaseToFile(database); 
 }
 
 export function databaseDelete(id) {
+  const index = database.findIndex(user => user.id === id)
   database = database.filter((user) => user.id !== id);
   writeDatabaseToFile(database);
 }
