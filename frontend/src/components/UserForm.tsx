@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Volunteer } from '../types'
+import { User } from '../types'
 
 type Props = {
-  handleSubmit: (formData: Volunteer) => void
-  initialFormState: Volunteer
+  handleSubmit: (formData: User) => void
+  initialFormState: User
 }
 
-function VolunteerForm({handleSubmit, initialFormState} : Props) {
+function UserForm({handleSubmit, initialFormState} : Props) {
   const [formData, setFormData] = useState(initialFormState)
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -74,8 +74,8 @@ function VolunteerForm({handleSubmit, initialFormState} : Props) {
         checked={formData.status}
         onChange={e => setFormData({...formData, status: e.target.value === "yes"})}
       />
-      <button type="submit">Add Volunteer</button>
+      <button type="submit">Add User</button>
     </form>
   )
 }
-export default VolunteerForm
+export default UserForm

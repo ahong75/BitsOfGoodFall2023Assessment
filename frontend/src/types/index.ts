@@ -1,2 +1,2 @@
-export type { Volunteer, TableEntryActions } from './Volunteer'
+export type { User } from './User'
 

@@ -1,12 +1,13 @@
 import './App.css';
 import { useState, useEffect } from 'react'
-import { TableEntry, VolunteerForm} from './components'
-import { Volunteer, TableEntryActions } from './types'
+import { UserForm } from './components'
+import { User } from './types'
+import userService from './services/users' 
 
 function App() {
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [volunteerFormDisplayMode, setVolunteerFormDisplayMode] = useState("notDisplaying");
-  const newVolunteerInitial = {
+  const [users, setUsers] = useState<User[]>([]);
+  const [userFormDisplayMode, setUserFormDisplayMode] = useState("notDisplaying");
+  const newUserInitial = {
     name: "",
     avatar: "",
     hero_project: "",
@@ -17,97 +18,86 @@ function App() {
     status: false,
     id: 0,
   }
-  const [volunteerToUpdate, setVolunteerToUpdate] = useState(newVolunteerInitial)
+  const [userToUpdate, setUserToUpdate] = useState(newUserInitial)
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/bog/users')
+    userService
+      .fetchUsers()
       .then(response => response.json())
-      .then(initialVolunteers => {
-        setVolunteers(initialVolunteers)
+      .then(initialUsers => {
+        setUsers(initialUsers)
       })
       .catch(error => {
-        console.error('Error fetching data', error)
+        console.error(error)
       })
   }, [])
   
-  const newVolunteerSubmit = (newVolunteer: Volunteer) => {
-    const newVolunteerWithId = {...newVolunteer, id: volunteers.length + 1}
-    fetch(`http://localhost:5000/api/bog/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVolunteerWithId),
-    })
-    .then(response => {
-      if (response.ok) {
-        setVolunteers([newVolunteerWithId, ...volunteers])
-      }
-    })
-    .catch(error => {
-      console.log('Error creating new volunteer', error)
-    })
-    setVolunteerFormDisplayMode("notDisplaying")
-  }
-
-  const updateVolunteerSubmit = (updatedVolunteer: Volunteer) => {
-    fetch(`http://localhost:5000/api/bog/users/${updatedVolunteer.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedVolunteer),
-    })
-    .then(response => {
-      if (response.ok) {
-        const updatedVolunteers = volunteers.map(volunteer => (
-          updatedVolunteer.id === volunteer.id ? updatedVolunteer : volunteer
-        ))
-        setVolunteers(updatedVolunteers)
-      }
-    })
-    .catch(error => {
-      console.error("Error updating volunteer", error)
-    })
-    setVolunteerFormDisplayMode("notDisplaying")
-  }
-
-  const tableEntryActions: TableEntryActions = {
-    edit: (volunteerId: number) => {
-      setVolunteerFormDisplayMode("updatingVolunteer")
-      const newVolunteerToUpdate = volunteers.find(volunteer => volunteer.id === volunteerId)
-      if (newVolunteerToUpdate) {
-        setVolunteerToUpdate(newVolunteerToUpdate)
-      }
-    },
-    delete: (volunteerId: number) => {
-      fetch(`http://localhost:5000/api/bog/users/${volunteerId}`, {
-        method: 'DELETE',
-      })
+  const newUserSubmit = (newUser: User) => {
+    const newUserWithId = { ...newUser, id: users.length + 1 }
+    userService
+      .createUser(newUserWithId)
       .then(response => {
         if (response.ok) {
-          setVolunteers(volunteers.filter(volunteer => volunteer.id !== volunteerId))
+          setUsers([newUserWithId, ...users])
         }
       })
       .catch(error => {
-        console.error("Error deleting volunteer", error)
+        console.log(error)
       })
+    setUserFormDisplayMode("notDisplaying")
+  }
+
+  const updateUserSubmit = (updatedUser: User) => {
+    userService
+      .updateUser(updatedUser)
+      .then(response => {
+        if (response.ok) {
+          const updatedUsers = users.map(user => (
+            updatedUser.id === user.id ? updatedUser : user
+          ))
+          setUsers(updatedUsers)
+        }
+      })
+      .catch(error => {
+        console.error(error)
+      })
+    setUserFormDisplayMode("notDisplaying")
+  }
+
+  const userUpdate = (userId: number) => {
+    setUserFormDisplayMode("updatingUser")
+    const newUserToUpdate = users.find(user => user.id === userId)
+    if (newUserToUpdate) {
+      setUserToUpdate(newUserToUpdate)
     }
+  }
+
+  const userDelete = (userId: number) => {
+    userService
+      .deleteUser(userId)
+      .then(response => {
+        if (response.ok) {
+          setUsers(users.filter(user => user.id !== userId))
+        }
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
   return (
     <div className="container mx-auto mt-8">
-      <button onClick={() => {setVolunteerFormDisplayMode("creatingVolunteer")}}>Add New Volunteer</button>
-      {volunteerFormDisplayMode === "creatingVolunteer" && (
-        <VolunteerForm handleSubmit={newVolunteerSubmit} initialFormState={newVolunteerInitial}/>
+      <button onClick={() => {setUserFormDisplayMode("creatingUser")}}>Add New User</button>
+      {userFormDisplayMode === "creatingUser" && (
+        <UserForm handleSubmit={newUserSubmit} initialFormState={newUserInitial}/>
       )}
-      {volunteerFormDisplayMode === "updatingVolunteer" && (
-        <VolunteerForm handleSubmit={updateVolunteerSubmit} initialFormState={volunteerToUpdate}/>
+      {userFormDisplayMode === "updatingUser" && (
+        <UserForm handleSubmit={updateUserSubmit} initialFormState={userToUpdate}/>
       )}
-      {volunteers.length > 0 ? (
+      {users.length > 0 ? (
         <table className="min-w-full">
           <thead>
             <tr>
-              {Object.keys(volunteers[0]).map(propertyName => (
+              {Object.keys(users[0]).map(propertyName => (
                 <th key={propertyName} className="px-4 py-2">
                   {propertyName}
                 </th>
@@ -116,10 +106,34 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {volunteers.map(volunteer => (
-              <TableEntry key={volunteer.id} volunteer={volunteer} actions={tableEntryActions}/>
+            {users.map(user => (
+              <tr>
+                <td className="font-bold px-4 py-2">{user.name}</td>
+                <td className="px-4 py-2">
+                  <img src={user.avatar} alt={`Face of ${user.name}`}/>
+                </td>
+                <td className="px-4 py-2">{user.hero_project}</td>
+                <td className="px-4 py-2">{user.notes}</td>
+                <td className="px-4 py-2">{user.email}</td>
+                <td className="px-4 py-2">{user.phone}</td>
+                <td className="px-4 py-2">{user.rating}</td>
+                <td className="px-4 py-2">
+                  {user.status ? (
+                    <span className="bg-green-500 text-white px-2 py-1 rounded-full">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="bg-red-500 text-white px-2 py-1 rounded-full">
+                      Inactive
+                    </span>
+                  )}
+                </td>
+                <td>
+                  <button onClick={() => {userUpdate(user.id)}}>Update</button>
+                  <button onClick={() => {userDelete(user.id)}}>Delete</button>
+                </td>
+              </tr>
             ))}
-            
           </tbody>
         </table>
       ) : (
@@ -130,4 +144,3 @@ function App() {
 }
 
 export default App;
-

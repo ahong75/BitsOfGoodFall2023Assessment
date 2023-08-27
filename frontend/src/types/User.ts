@@ -1,4 +1,4 @@
-export type Volunteer = {
+export type User = {
   name: string;
   avatar: string;
   hero_project: string;
@@ -8,9 +8,4 @@ export type Volunteer = {
   rating: number;
   status: boolean;
   id: number;
-}
-
-export type TableEntryActions = {
-  edit: (volunteerId: number) => void;
-  delete: (volunteerId: number) => void;
 }
