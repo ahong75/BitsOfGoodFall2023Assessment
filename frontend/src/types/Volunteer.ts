@@ -9,3 +9,8 @@ export type Volunteer = {
   status: boolean;
   id: number;
 }
+
+export type TableEntryActions = {
+  edit: (volunteerId: number) => void;
+  delete: (volunteerId: number) => void;
+}

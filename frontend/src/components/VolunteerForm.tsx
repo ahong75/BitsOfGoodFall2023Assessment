@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Volunteer } from '../types'
 
-interface Props {
+type Props = {
   handleSubmit: (formData: Volunteer) => void
   initialFormState: Volunteer
 }

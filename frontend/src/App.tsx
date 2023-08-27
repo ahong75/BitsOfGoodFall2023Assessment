@@ -1,10 +1,23 @@
 import './App.css';
 import { useState, useEffect } from 'react'
-import { TableEntry, AddVolunteer} from './components'
-import { Volunteer } from './types'
+import { TableEntry, VolunteerForm} from './components'
+import { Volunteer, TableEntryActions } from './types'
 
 function App() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [volunteerFormDisplayMode, setVolunteerFormDisplayMode] = useState("notDisplaying");
+
+  const newVolunteerInitial = {
+    name: "",
+    avatar: "",
+    hero_project: "",
+    notes: "",
+    email: "",
+    phone: "",
+    rating: 0,
+    status: false,
+    id: 0,
+  }
 
   useEffect(() => {
     fetch('http://localhost:5000/api/bog/users')
@@ -17,9 +30,67 @@ function App() {
       })
   }, [])
   
+  const newVolunteerSubmit = (newVolunteer: Volunteer) => {
+    const newVolunteerWithId = {...newVolunteer, id: volunteers.length + 1}
+    fetch(`http://localhost:5000/api/bog/users`, {
+      method: 'POST',
+    })
+    .then(response => {
+      if (response.ok) {
+        setVolunteers([newVolunteerWithId, ...volunteers])
+      }
+    })
+    .catch(error => {
+      console.log('Error creating new volunteer', error)
+    })
+    setVolunteerFormDisplayMode("notDisplaying")
+  }
+
+  const updateVolunteerSubmit = (updatedVolunteer: Volunteer) => {
+    fetch(`http://localhost:5000/api/bog/users/${updatedVolunteer.id}`, {
+      method: 'PUT',
+    })
+    .then(response => {
+      if (response.ok) {
+        const updatedVolunteers = volunteers.map(volunteer => (
+          updatedVolunteer.id === volunteer.id ? updatedVolunteer : volunteer
+        ))
+        setVolunteers(updatedVolunteers)
+      }
+    })
+    .catch(error => {
+      console.error("Error updating volunteer", error)
+    })
+    setVolunteerFormDisplayMode("notDisplaying")
+  }
+
+  const tableEntryActions: TableEntryActions = {
+    edit: (volunteerId: number) => {
+      setVolunteerFormDisplayMode("updatingVolunteer")
+    },
+    delete: (volunteerId: number) => {
+      fetch(`http://localhost:5000/api/bog/users/${volunteerId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (response.ok) {
+          setVolunteers(volunteers.filter(volunteer => volunteer.id !== volunteerId))
+        }
+      })
+      .catch(error => {
+        console.error("Error deleting volunteer", error)
+      })
+    }
+  }
   return (
     <div className="container mx-auto mt-8">
-      <AddVolunteer volunteers={volunteers} setVolunteers={setVolunteers} />
+      <button onClick={() => {setVolunteerFormDisplayMode("creatingVolunteer")}}>Add New Volunteer</button>
+      {volunteerFormDisplayMode === "creatingVolunteer" && (
+        <VolunteerForm handleSubmit={newVolunteerSubmit} initialFormState={newVolunteerInitial}/>
+      )}
+      {volunteerFormDisplayMode === "updatingVolunteer" && (
+        <VolunteerForm handleSubmit={updateVolunteerSubmit} initialFormState={newVolunteerInitial}/>
+      )}
       {volunteers.length > 0 ? (
         <table className="min-w-full">
           <thead>
@@ -29,12 +100,14 @@ function App() {
                   {propertyName}
                 </th>
               ))}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {volunteers.map(volunteer => (
-              <TableEntry key={volunteer.id} volunteer={volunteer} />
+              <TableEntry key={volunteer.id} volunteer={volunteer} actions={tableEntryActions}/>
             ))}
+            
           </tbody>
         </table>
       ) : (

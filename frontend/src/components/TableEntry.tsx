@@ -1,5 +1,10 @@
-import { Volunteer } from '../types'
-function TableEntry({ volunteer } : { volunteer: Volunteer }) {
+import { Volunteer, TableEntryActions } from '../types'
+
+type Props = {
+  volunteer: Volunteer
+  actions: TableEntryActions
+}
+function TableEntry({ volunteer, actions } : Props) {
   return (
     <tr>
       <td className="font-bold px-4 py-2">{volunteer.name}</td>
@@ -21,6 +26,10 @@ function TableEntry({ volunteer } : { volunteer: Volunteer }) {
             Inactive
           </span>
         )}
+      </td>
+      <td>
+        <button onClick={() => {actions.edit(volunteer.id)}}>Update</button>
+        <button onClick={() => {actions.delete(volunteer.id)}}>Delete</button>
       </td>
     </tr>
   )
