@@ -1,10 +1,11 @@
-import { useParams } from 'react-router-dom'
-
-function UserNotes() {
-  const userId = useParams()
+import { User } from '../types'
+type Props = {
+  user: User
+}
+function UserNotes({ user } : Props) {
   return (
-    <div>
-      <h2>User Notes</h2>
+    <div className="text-xl">
+     {user.notes}
     </div>
   )
 }
