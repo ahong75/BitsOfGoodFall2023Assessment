@@ -14,12 +14,12 @@ function CreateUserForm({ newUserInitial, setUserFormDisplayMode } : Props) {
       queryClient.invalidateQueries(['users'])
     }
   })
-  const handleNewUserSave = (newUser: User) => {
+  const handleCreateUserSave = (newUser: User) => {
     createUserMutation.mutate(newUser)
     setUserFormDisplayMode("notDisplaying")
   }
   return (
-    <UserForm handleSubmit={handleNewUserSave} initialFormState={newUserInitial}/>
+    <UserForm handleSubmit={handleCreateUserSave} initialFormState={newUserInitial}/>
   )
 }
 
