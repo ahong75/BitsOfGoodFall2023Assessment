@@ -1,5 +1,5 @@
 import express from 'express';
-import { database, databaseUpdate, databaseDelete } from './database.js';
+import { database, databaseUpdate, databaseDelete, databaseCreate } from './database.js';
 import cors from "cors";
 
 const app = express();
@@ -15,7 +15,6 @@ app.get('/api/bog/users', (req, res) => {
   res.json(database).status(200);
 });
 
-
 app.get('/api/bog/users/:id', (req, res) => {
   const user = database.filter((user) => user.id === req.params.id)[0]
   res.json(user).status(200)
@@ -23,22 +22,36 @@ app.get('/api/bog/users/:id', (req, res) => {
 
 app.put('/api/bog/users/:id', (req, res) => {
   const updatedUser = req.body
-  if (databaseUpdate(updatedUser) == -1) {
-    res.json({error: 'Volunteer not found'}).status(400)
+  try {
+    databaseUpdate(updatedUser)
+  }
+  catch(error) {
+    res.json("Update failure").status(400)
     return;
   }
   res.json(updatedUser).status(200)
 });
 
 app.post('/api/bog/users', (req, res) => {
-  database = database.push(req.body)
+  const newUser = req.body
+  try {
+    databaseCreate(newUser)
+  }
+  catch(error) {
+    res.json("Create failure").status(400)
+    return;
+  }
   res.json(req.params).status(201)
 });
 
 app.delete('/api/bog/users/:id', (req, res) => {
   const id = req.params.id
-  if (databaseDelete(id) == -1) {
-    res.json({error: 'Volunteer not found'}).status(400)
+  try {
+    databaseDelete(id)
+  }
+  catch(error) {
+    res.json("Delete failure").status(400)
+    console.log(error)
     return;
   }
   res.json('Volunteer successfully deleted').status(200)

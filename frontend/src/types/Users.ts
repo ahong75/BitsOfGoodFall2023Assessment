@@ -7,5 +7,7 @@ export type User = {
   phone: string;
   rating: number;
   status: boolean;
-  id: number;
+  id: string;
 }
+
+export type UserFormDisplayMode = "notDisplaying" | "updatingUser" | "creatingUser"

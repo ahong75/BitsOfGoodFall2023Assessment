@@ -1,49 +1,5 @@
 [
   {
-    "name": "Nancy Muller",
-    "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/221.jpg",
-    "hero_project": "interface",
-    "notes": "South",
-    "email": "Casandra_Wolff@gmail.com",
-    "phone": "436.625.5633",
-    "rating": "6",
-    "status": false,
-    "id": "25"
-  },
-  {
-    "name": "Elizabeth Cruickshank",
-    "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/394.jpg",
-    "hero_project": "interface",
-    "notes": "lumen Korean",
-    "email": "Theron68@hotmail.com",
-    "phone": "1-530-261-6954 x71026",
-    "rating": "9",
-    "status": false,
-    "id": "26"
-  },
-  {
-    "name": "Dominic Gusikowski",
-    "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/578.jpg",
-    "hero_project": "hard drive",
-    "notes": "Director",
-    "email": "Godfrey_Pacocha76@gmail.com",
-    "phone": "241.459.7103 x2992",
-    "rating": "3",
-    "status": false,
-    "id": "27"
-  },
-  {
-    "name": "Adrienne Dooley",
-    "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/369.jpg",
-    "hero_project": "application",
-    "notes": "within Bronze South",
-    "email": "Therese_Collins49@hotmail.com",
-    "phone": "607-710-1196 x29368",
-    "rating": "7",
-    "status": false,
-    "id": "28"
-  },
-  {
     "name": "Douglas Mraz MD",
     "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/195.jpg",
     "hero_project": "pixel",
@@ -548,17 +504,6 @@
     "rating": "7",
     "status": false,
     "id": "74"
-  },
-  {
-    "name": "Deborah Schultz",
-    "avatar": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/817.jpg",
-    "hero_project": "monitor",
-    "notes": "THX background",
-    "email": "Brennan_Adams15@gmail.com",
-    "phone": "401.823.3577 x4565",
-    "rating": "6",
-    "status": false,
-    "id": "75"
   },
   {
     "name": "Dr. Clara Kuhlman",

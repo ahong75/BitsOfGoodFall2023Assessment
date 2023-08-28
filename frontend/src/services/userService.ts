@@ -30,7 +30,7 @@ async function createUser(newUser: User): Promise<User> {
   }
 }
 
-async function deleteUser(id: number): Promise<void> {
+async function deleteUser(id: string): Promise<void> {
   try {
     const response = await fetch(`${baseUrl}/${id}`, {
       method: 'DELETE',

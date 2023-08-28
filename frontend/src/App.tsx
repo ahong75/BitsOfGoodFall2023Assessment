@@ -1,15 +1,14 @@
 import './App.css';
 import { useState } from 'react'
-import { UserForm } from './components'
-import { User } from './types'
+import { UpdateUserForm, CreateUserForm } from './components'
+import { User, UserFormDisplayMode } from './types'
 import userService from './services/userService' 
 import { useQueryClient, useMutation, useQuery } from 'react-query'
 
-type UserFormDisplayMode = "notDisplaying" | "updatingUser" | "creatingUser"
 function App() {
   const { data: users = [], isLoading, isError, error} = useQuery<User[], Error>('users', userService.fetchUsers)
   const [userFormDisplayMode, setUserFormDisplayMode] = useState<UserFormDisplayMode>("notDisplaying");
-  const newUserInitial = {
+  const newUserInitial: User = {
     name: "",
     avatar: "",
     hero_project: "",
@@ -18,41 +17,21 @@ function App() {
     phone: "",
     rating: 0,
     status: false,
-    id: 0,
+    id: (users.length + 1).toString(),
   }
   const [userToUpdate, setUserToUpdate] = useState(newUserInitial)
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const queryClient = useQueryClient()
-  const createUserMutation = useMutation(userService.createUser, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['users'])
-    }
-  })
-  const updateUserMutation = useMutation(userService.updateUser, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['users'])
-    }
-  })
+
   const deleteUserMutation = useMutation(userService.deleteUser, {
     onSuccess: () => {
       queryClient.invalidateQueries(['users'])
     }
   })
 
-  const handleNewUserSave = (newUser: User) => {
-    const newUserWithId = { ...newUser, id: users.length + 1 }
-    createUserMutation.mutate(newUserWithId)
-    setUserFormDisplayMode("notDisplaying")
-  }
-
-  const handleUpdateUserSave = (updatedUser: User) => {
-    updateUserMutation.mutate(updatedUser)
-    setUserFormDisplayMode("notDisplaying")
-  }
-
-  const handleUpdateUserButton = (userId: number) => {
+  const handleUpdateUserButton = (userId: string) => {
     setUserFormDisplayMode("updatingUser")
     const newUserToUpdate = users.find(user => user.id === userId)
     if (newUserToUpdate) {
@@ -60,7 +39,7 @@ function App() {
     }
   }
 
-  const handleDeleteUserButton = (userId: number) => {
+  const handleDeleteUserButton = (userId: string) => {
     deleteUserMutation.mutate(userId)
   }
 
@@ -86,16 +65,17 @@ function App() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = users.slice(indexOfFirstItem, indexOfLastItem)
+
   return (
     <div className="container mx-auto mt-8">
       {isLoading && 'Loading...'}
       {isError && error.message}
       <button onClick={() => {setUserFormDisplayMode("creatingUser")}}>Add New User</button>
       {userFormDisplayMode === "creatingUser" && (
-        <UserForm handleSubmit={handleNewUserSave} initialFormState={newUserInitial}/>
+        <CreateUserForm newUserInitial={{...newUserInitial, id: (users.length + 1).toString()}} setUserFormDisplayMode={setUserFormDisplayMode}/>
       )}
       {userFormDisplayMode === "updatingUser" && (
-        <UserForm handleSubmit={handleUpdateUserSave} initialFormState={userToUpdate}/>
+        <UpdateUserForm userToUpdate={userToUpdate} setUserFormDisplayMode={setUserFormDisplayMode}/>
       )}
       {users.length > 0 ? (
         <table className="min-w-full">
