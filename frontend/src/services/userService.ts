@@ -1,6 +1,6 @@
 import { User } from '../types'
 const baseUrl = 'http://localhost:5000/api/bog/users'
-async function fetchUsers() {
+async function fetchUsers(): Promise<User[]> {
   try {
     const response = await fetch(baseUrl);
     const data = await response.json();
@@ -10,7 +10,7 @@ async function fetchUsers() {
   }
 }
 
-async function createUser(newUser: User) {
+async function createUser(newUser: User): Promise<User> {
   try {
     const response = await fetch(baseUrl, {
       method: 'POST',
@@ -30,7 +30,7 @@ async function createUser(newUser: User) {
   }
 }
 
-async function deleteUser(id: number) {
+async function deleteUser(id: number): Promise<void> {
   try {
     const response = await fetch(`${baseUrl}/${id}`, {
       method: 'DELETE',
@@ -45,7 +45,7 @@ async function deleteUser(id: number) {
   }
 }
 
-async function updateUser(updatedUser: User) {
+async function updateUser(updatedUser: User): Promise<User> {
   try {
     const response = await fetch(`${baseUrl}/${updatedUser.id}`, {
       method: 'PUT',

@@ -1,12 +1,14 @@
 import './App.css';
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { UserForm } from './components'
 import { User } from './types'
-import userService from './services/users' 
+import userService from './services/userService' 
+import { useQueryClient, useMutation, useQuery } from 'react-query'
 
+type UserFormDisplayMode = "notDisplaying" | "updatingUser" | "creatingUser"
 function App() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [userFormDisplayMode, setUserFormDisplayMode] = useState("notDisplaying");
+  const { data: users = [], isLoading, isError, error} = useQuery<User[], Error>('users', userService.fetchUsers)
+  const [userFormDisplayMode, setUserFormDisplayMode] = useState<UserFormDisplayMode>("notDisplaying");
   const newUserInitial = {
     name: "",
     avatar: "",
@@ -19,52 +21,38 @@ function App() {
     id: 0,
   }
   const [userToUpdate, setUserToUpdate] = useState(newUserInitial)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    userService
-      .fetchUsers()
-      .then(response => response.json())
-      .then(initialUsers => {
-        setUsers(initialUsers)
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  }, [])
-  
-  const newUserSubmit = (newUser: User) => {
+  const queryClient = useQueryClient()
+  const createUserMutation = useMutation(userService.createUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users'])
+    }
+  })
+  const updateUserMutation = useMutation(userService.updateUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users'])
+    }
+  })
+  const deleteUserMutation = useMutation(userService.deleteUser, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users'])
+    }
+  })
+
+  const handleNewUserSave = (newUser: User) => {
     const newUserWithId = { ...newUser, id: users.length + 1 }
-    userService
-      .createUser(newUserWithId)
-      .then(response => {
-        if (response.ok) {
-          setUsers([newUserWithId, ...users])
-        }
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    createUserMutation.mutate(newUserWithId)
     setUserFormDisplayMode("notDisplaying")
   }
 
-  const updateUserSubmit = (updatedUser: User) => {
-    userService
-      .updateUser(updatedUser)
-      .then(response => {
-        if (response.ok) {
-          const updatedUsers = users.map(user => (
-            updatedUser.id === user.id ? updatedUser : user
-          ))
-          setUsers(updatedUsers)
-        }
-      })
-      .catch(error => {
-        console.error(error)
-      })
+  const handleUpdateUserSave = (updatedUser: User) => {
+    updateUserMutation.mutate(updatedUser)
     setUserFormDisplayMode("notDisplaying")
   }
 
-  const userUpdate = (userId: number) => {
+  const handleUpdateUserButton = (userId: number) => {
     setUserFormDisplayMode("updatingUser")
     const newUserToUpdate = users.find(user => user.id === userId)
     if (newUserToUpdate) {
@@ -72,26 +60,42 @@ function App() {
     }
   }
 
-  const userDelete = (userId: number) => {
-    userService
-      .deleteUser(userId)
-      .then(response => {
-        if (response.ok) {
-          setUsers(users.filter(user => user.id !== userId))
-        }
-      })
-      .catch(error => {
-        console.error(error)
-      })
+  const handleDeleteUserButton = (userId: number) => {
+    deleteUserMutation.mutate(userId)
   }
+
+  const renderPaginationControls = () => {
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+
+    return (
+      <div>
+        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button key={i + 1} onClick={() => setCurrentPage(i + 1)}>
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+    );
+  };
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem)
   return (
     <div className="container mx-auto mt-8">
+      {isLoading && 'Loading...'}
+      {isError && error.message}
       <button onClick={() => {setUserFormDisplayMode("creatingUser")}}>Add New User</button>
       {userFormDisplayMode === "creatingUser" && (
-        <UserForm handleSubmit={newUserSubmit} initialFormState={newUserInitial}/>
+        <UserForm handleSubmit={handleNewUserSave} initialFormState={newUserInitial}/>
       )}
       {userFormDisplayMode === "updatingUser" && (
-        <UserForm handleSubmit={updateUserSubmit} initialFormState={userToUpdate}/>
+        <UserForm handleSubmit={handleUpdateUserSave} initialFormState={userToUpdate}/>
       )}
       {users.length > 0 ? (
         <table className="min-w-full">
@@ -106,8 +110,8 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr>
+            {currentItems.map(user => (
+              <tr key={user.id}>
                 <td className="font-bold px-4 py-2">{user.name}</td>
                 <td className="px-4 py-2">
                   <img src={user.avatar} alt={`Face of ${user.name}`}/>
@@ -129,8 +133,8 @@ function App() {
                   )}
                 </td>
                 <td>
-                  <button onClick={() => {userUpdate(user.id)}}>Update</button>
-                  <button onClick={() => {userDelete(user.id)}}>Delete</button>
+                  <button onClick={() => {handleUpdateUserButton(user.id)}}>Update</button>
+                  <button onClick={() => {handleDeleteUserButton(user.id)}}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -139,6 +143,7 @@ function App() {
       ) : (
         <p>Loading...</p>
       )}
+      {renderPaginationControls()}
     </div>
   )
 }
