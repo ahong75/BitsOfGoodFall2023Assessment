@@ -33,7 +33,6 @@ export function databaseUpdate(updatedUser) {
 
 export function databaseDelete(id) {
   const index = database.findIndex(user => user.id === id)
-  console.log(id === database[0].id)
   if (index == -1) throw new Error('Object with given id does not exist')
   database = database.filter((user) => user.id !== id);
   writeDatabaseToFile(database);

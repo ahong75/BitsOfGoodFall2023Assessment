@@ -9,8 +9,8 @@ type Props = {
 }
 function UserTable({ users, setUserFormDisplayMode, setUserToUpdate } : Props) {
   const navigate = useNavigate()
-  const handleUpdateClick = (userId: string) => {
-    setUserFormDisplayMode('updatingUser')
+
+  const handleUpdateClick = (userId: string) => { setUserFormDisplayMode('updatingUser')
     const newUserToUpdate = users.find((user) => user.id === userId)
     if (newUserToUpdate) {
       setUserToUpdate(newUserToUpdate)
