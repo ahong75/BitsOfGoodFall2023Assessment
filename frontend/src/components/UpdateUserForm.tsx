@@ -1,19 +1,13 @@
 import { UserForm } from '.'
 import { User, UserFormDisplayMode } from '../types'
-import userService from '../services/userService' 
-import { useQueryClient, useMutation } from 'react-query'
+import { useUpdateUserMutation } from '../hooks/userHooks'
 
 type Props = {
   userToUpdate: User
   setUserFormDisplayMode: (mode: UserFormDisplayMode) => void
 }
 function UpdateUserForm({ userToUpdate, setUserFormDisplayMode } : Props) {
-  const queryClient = useQueryClient()
-  const updateUserMutation = useMutation(userService.updateUser, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['users'])
-    }
-  })
+  const updateUserMutation = useUpdateUserMutation()
   const handleUpdateUserSave = (updatedUser: User) => {
     updateUserMutation.mutate(updatedUser)
     setUserFormDisplayMode("notDisplaying")
