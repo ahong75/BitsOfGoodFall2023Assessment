@@ -19,7 +19,7 @@ function CreateUserForm({ newUserInitial, setUserFormDisplayMode } : Props) {
     setUserFormDisplayMode("notDisplaying")
   }
   return (
-    <UserForm handleSubmit={handleCreateUserSave} initialFormState={newUserInitial}/>
+    <UserForm handleSubmit={handleCreateUserSave} initialFormState={newUserInitial} setUserFormDisplayMode={setUserFormDisplayMode}/>
   )
 }
 

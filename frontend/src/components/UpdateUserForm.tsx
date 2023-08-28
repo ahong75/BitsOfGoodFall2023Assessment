@@ -19,7 +19,7 @@ function UpdateUserForm({ userToUpdate, setUserFormDisplayMode } : Props) {
     setUserFormDisplayMode("notDisplaying")
   }
   return (
-    <UserForm handleSubmit={handleUpdateUserSave} initialFormState={userToUpdate}/>
+    <UserForm handleSubmit={handleUpdateUserSave} initialFormState={userToUpdate} setUserFormDisplayMode={setUserFormDisplayMode}/>
   )
 }
 
